@@ -48,44 +48,44 @@ def isCellAvailable(index, trees):
 def chooseCellToSeed(arbre,trees,listOfCells):
     index = -1
     actualCell = None
+    print("##############" + str( arbre.location) +"//" + str(len(arbre.actionSeed)), file=sys.stderr, flush=True)
     for actionSeed in arbre.actionSeed:
         param = actionSeed.split(" ")
         index = int(param[2])
         newCell = None
         for cell in listOfCells:
-            #print("poooo", file=sys.stderr, flush=True)
             if cell.index == index:
                 newCell = cell
                 break
+        print("poooo" + str( newCell.index), file=sys.stderr, flush=True)
         if isCellAvailable(index,trees):
+            print("available " + str( newCell.index), file=sys.stderr, flush=True)
             if actualCell is None:
                 actualCell = newCell
             else:
                 if newCell.richness > actualCell.richness:
                     actualCell = newCell
 
-    return actualCell.index
+    if actualCell is not None:
+        return actualCell.index
+    return 0
     
 
 
 class Cell:
-    index = 0
-    richness = 0
-    neigh=[]
-    
- 
     def __init__(self):
-        pass
+        self.index = 0
+        self.richness = 0
+        self.neigh=[]
 
 class Tree:
-    size = 0
-    location = 0
-    isDormant = False
-    actionSeed = []
-    mine = False
-    lastTick_Seeded = 0
     def __init__(self):
-        pass
+        self.size = 0
+        self.location = 0
+        self.isDormant = False
+        self.actionSeed = []
+        self.mine = False
+        self.lastTick_Seeded = 0
 
 
 number_of_cells = int(input())  # 37
@@ -135,19 +135,20 @@ while True:
             arbre.location = cell_index
             listOfTrees.append(arbre)
 
-    listOfActions=[]
+    #listOfActions=[]
     number_of_possible_actions = int(input())  # all legal actions
     hasPrinted = False
     for i in range(number_of_possible_actions):
         possible_action = input()  # try printing something from here to start with
         print("Debug messages..." + possible_action, file=sys.stderr, flush=True)
-        listOfActions.append(possible_action)
+        #listOfActions.append(possible_action)
         if "SEED" in possible_action:
             param=possible_action.split(" ")
             for t in listOfTrees:
                 if t.location == int(param[1]):
                     #print("DPWET..." + str(t.location) + "§§" + str(int(param[1])), file=sys.stderr, flush=True)
                     t.actionSeed.append(possible_action)
+                    print("Debug SEEDD..." + str(len(t.actionSeed)), file=sys.stderr, flush=True)
 
 
     #if not hasPrinted:
@@ -162,9 +163,9 @@ while True:
                 sun -= 4
             else:
                 nbArbre = nbDarbreMine(listOfTrees)
-                if (arbre.size == 2) and (nbArbre<5):
+                if (arbre.size == 2) and (nbArbre<6):
                     nbPtNeeded = calcPointToSeed(listOfTrees)
-                    print("arbre seed " + str(arbre.location) + " action = " + arbre.actionSeed[0], file=sys.stderr, flush=True)
+                    #print("arbre seed " + str(arbre.location) + " action = " + arbre.actionSeed[0], file=sys.stderr, flush=True)
                     if (nbPtNeeded <= sun):
                         lastSeedTick = actualTick
                         cellToSeed = chooseCellToSeed(arbre,listOfTrees,listOfCells)
