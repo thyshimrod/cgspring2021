@@ -16,9 +16,9 @@ def calcPointGrow(size,trees):
         base = 7
 
     for arbre in trees:
-        if arbre.size == size and arbre.mine:
+        if arbre.size == (size+1) and arbre.mine:
             base += 1
-    base -= 1
+
     return base
 
 def nbDarbreMine(trees):
@@ -48,7 +48,7 @@ def isCellAvailable(index, trees):
 def chooseCellToSeed(arbre,trees,listOfCells):
     index = -1
     actualCell = None
-    #print("##############" + str( arbre.location) +"//" + str(len(arbre.actionSeed)), file=sys.stderr, flush=True)
+    print("##############" + str( arbre.location) +"//" + str(len(arbre.actionSeed)), file=sys.stderr, flush=True)
     for actionSeed in arbre.actionSeed:
         param = actionSeed.split(" ")
         index = int(param[2])
@@ -57,9 +57,9 @@ def chooseCellToSeed(arbre,trees,listOfCells):
             if cell.index == index:
                 newCell = cell
                 break
-        #print("poooo" + str( newCell.index), file=sys.stderr, flush=True)
+        print("poooo" + str( newCell.index), file=sys.stderr, flush=True)
         if isCellAvailable(index,trees):
-            #print("available " + str( newCell.index), file=sys.stderr, flush=True)
+            print("available " + str( newCell.index), file=sys.stderr, flush=True)
             if actualCell is None:
                 actualCell = newCell
             else:
@@ -148,7 +148,7 @@ while True:
                 if t.location == int(param[1]):
                     #print("DPWET..." + str(t.location) + "§§" + str(int(param[1])), file=sys.stderr, flush=True)
                     t.actionSeed.append(possible_action)
-                    #print("Debug SEEDD..." + str(len(t.actionSeed)), file=sys.stderr, flush=True)
+                    print("Debug SEEDD..." + str(len(t.actionSeed)), file=sys.stderr, flush=True)
 
 
     #if not hasPrinted:
@@ -163,7 +163,7 @@ while True:
                 sun -= 4
             else:
                 nbArbre = nbDarbreMine(listOfTrees)
-                if (arbre.size == 2) and (nbArbre<5):
+                if (arbre.size >= 1) and (nbArbre<7) and (not arbre.isDormant):
                     nbPtNeeded = calcPointToSeed(listOfTrees)
                     #print("arbre seed " + str(arbre.location) + " action = " + arbre.actionSeed[0], file=sys.stderr, flush=True)
                     if (nbPtNeeded <= sun):
