@@ -51,15 +51,29 @@ while True:
         possible_action = input()  # try printing something from here to start with
         print("Debug messages..." + possible_action, file=sys.stderr, flush=True)
         listOfActions.append(possible_action)
-        if possible_action != "WAIT" and not hasPrinted:
-            print(str(possible_action))
-            hasPrinted = True
+        #if possible_action != "WAIT" and not hasPrinted:
+        #    print(str(possible_action))
+        #    hasPrinted = True
 
-    if not hasPrinted:
-        print("WAIT")         
+    #if not hasPrinted:
+    #    print("WAIT")         
     # Write an action using print
     # To debug: print("Debug messages...", file=sys.stderr, flush=True)
+    for abre in myTrees:
+        if arbre.size == 3 and not hasPrinted:
+            print("COMPLETE " + arbre.location)
+            hasPrinted = True
+            break
 
+    if not hasPrinted:
+        for abre in myTrees:
+            if arbre.size == 3 and not hasPrinted:
+                print("GROW " + arbre.location)
+                hasPrinted = True
+                break
+    
+    if not hasPrinted:
+        print ("WAIT")
 
     # GROW cellIdx | SEED sourceIdx targetIdx | COMPLETE cellIdx | WAIT <message>
     #print("WAIT")
