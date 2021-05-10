@@ -21,6 +21,14 @@ def calcPointGrow(size,trees):
     base -= 1
     return base
 
+def nbDarbreMine(trees):
+    nb = 0
+    for t in trees:
+        if t.mine:
+            nb += 1
+
+    return nb
+
 def calcPointToSeed(trees):
     pt = 0
     for arbre in trees:
@@ -153,7 +161,8 @@ while True:
                 hasPrinted = True
                 sun -= 4
             else:
-                if (arbre.size == 2) and (lastSeedTick < (actualTick-5)):
+                nbArbre = nbDarbreMine(listOfTrees)
+                if (arbre.size == 2) and (nbArbre<5):
                     nbPtNeeded = calcPointToSeed(listOfTrees)
                     print("arbre seed " + str(arbre.location) + " action = " + arbre.actionSeed[0], file=sys.stderr, flush=True)
                     if (nbPtNeeded <= sun):
