@@ -18,6 +18,7 @@ def calcPointGrow(size,trees):
     for arbre in trees:
         if arbre.size == (size+1) and arbre.mine:
             base += 1
+
     return base
 
 def nbDarbreMine(trees):
@@ -44,21 +45,10 @@ def isCellAvailable(index, trees):
     
     return available
 
-def nbTreeForLevel(trees,level):
-    nb = 0
-    for t in trees:
-        if t.mine and t.size == level:
-            nb += 1
-    return nb
-
 def chooseCellToSeed(arbre,trees,listOfCells):
     index = -1
     actualCell = None
-    arbreCell = None
-    for c in listOfCells:
-        if c.index == arbre.location:
-            arbreCell = c
-            break
+    #print("##############" + str( arbre.location) +"//" + str(len(arbre.actionSeed)), file=sys.stderr, flush=True)
     for actionSeed in arbre.actionSeed:
         param = actionSeed.split(" ")
         index = int(param[2])
@@ -68,23 +58,11 @@ def chooseCellToSeed(arbre,trees,listOfCells):
                 newCell = cell
                 break
         if isCellAvailable(index,trees):
+            #print("available " + str( newCell.index), file=sys.stderr, flush=True)
             if actualCell is None:
                 actualCell = newCell
             else:
-                #if newCell.richness > actualCell.richness:
-                if arbre.size == 2 :
-                    if arbreCell.richness <3 and newCell.richness == 3:
-                        actualCell = newCell
-                        break
-                    elif arbreCell.richness == 3 and newCell.richness == 1:
-                        actualCell = newCell
-                        break
-                            
-                    else:
-                        if newCell.richness == 1:
-                            actualCell = newCell
-                            break
-                elif newCell.richness == 2:
+                if newCell.richness > actualCell.richness:
                     actualCell = newCell
 
     if actualCell is not None:
@@ -127,12 +105,10 @@ for i in range(number_of_cells):
     listOfCells.append(cell)
 
 # game loop
-hasSeeded = False
-waitForGrow = False
-tour = 0
+actualTick = 0
+lastSeedTick = 0
 while True:
-    tour += 1
-    hasSeeded = not hasSeeded
+
     day = int(input())  # the game lasts 24 days: 0-23
     nutrients = int(input())  # the base score you gain from the next COMPLETE action
     # sun: your sun points
@@ -171,7 +147,7 @@ while True:
                 if t.location == int(param[1]):
                     #print("DPWET..." + str(t.location) + "§§" + str(int(param[1])), file=sys.stderr, flush=True)
                     t.actionSeed.append(possible_action)
-                   # print("Debug SEEDD..." + str(len(t.actionSeed)), file=sys.stderr, flush=True)
+                    #print("Debug SEEDD..." + str(len(t.actionSeed)), file=sys.stderr, flush=True)
 
 
     #if not hasPrinted:
@@ -179,60 +155,35 @@ while True:
     # Write an action using print
     # To debug: print("Debug messages...", file=sys.stderr, flush=True)
     for arbre in listOfTrees:
-        #hasPrinted = False
         if not hasPrinted and arbre.mine:
-            print("PPPPPP" + str(tour), file=sys.stderr, flush=True)
-            nbBigTree = nbTreeForLevel(listOfTrees,3)
-            if (arbre.size == 3) and(sun >= 4) and ((tour > 40) or nbBigTree>4):
+            if arbre.size == 3 and sun >= 4:
                 print("COMPLETE " + str(arbre.location))
                 hasPrinted = True
                 sun -= 4
-            
-            if not hasPrinted:
+            else:
                 nbArbre = nbDarbreMine(listOfTrees)
-                nbSeed = nbTreeForLevel(listOfTrees,0)
-                if (arbre.size >= 1) and (nbArbre<8) and (not arbre.isDormant) and (hasSeeded) and (nbSeed < 2):
+                if (arbre.size == 2) and (nbArbre<5):
                     nbPtNeeded = calcPointToSeed(listOfTrees)
                     #print("arbre seed " + str(arbre.location) + " action = " + arbre.actionSeed[0], file=sys.stderr, flush=True)
                     if (nbPtNeeded <= sun):
+                        lastSeedTick = actualTick
                         cellToSeed = chooseCellToSeed(arbre,listOfTrees,listOfCells)
-                        if cellToSeed != -1:
+                        if cellToSeed  != -1:
                             print("SEED " + str(arbre.location) + " " + str(cellToSeed))
                             hasPrinted = True
                             sun -= nbPtNeeded
-                            hasSeeded = True
-                            break
-
-                if not hasPrinted and arbre.mine:
-                    if (arbre.size == 3) and(sun >= 4) and (tour > 40):
-                        print("COMPLETE " + str(arbre.location))
-                        hasPrinted = True
-                        sun -= 4
-
                 if not hasPrinted:
                     nbPtNeeded = calcPointGrow(arbre.size,listOfTrees)
                     print("abre size=" + str(arbre.size) + " location=" + str(arbre.location) + " ptneeded=" + str(nbPtNeeded) + " sun=" + str(sun), file=sys.stderr, flush=True)
-                    if  (not arbre.isDormant) and (arbre.size < 3):
-                        if (nbPtNeeded <= sun):
-                            print("GROW " + str( arbre.location))
-                            hasPrinted = True
-                            sun -= nbPtNeeded
-                            break
-                        
-
-   # if not hasPrinted :                
-   #     for arbre in listOfTrees:
-    ##        nbPtNeeded = calcPointGrow(arbre.size,listOfTrees)
-    #        print("abre size=" + str(arbre.size) + " location=" + str(arbre.location) + " ptneeded=" + str(nbPtNeeded) + " sun=" + str(sun), file=sys.stderr, flush=True)
-     #       if (nbPtNeeded <= sun) and (arbre.size < 3) and (not arbre.isDormant):
-   #             print("GROW " + str( arbre.location))
-     #           hasPrinted = True
-     #           sun -= nbPtNeeded
-     #           break
-            
-            
+                    if (nbPtNeeded <= sun) and (arbre.size < 3) and (not arbre.isDormant):
+                        print("GROW " + str( arbre.location))
+                        hasPrinted = True
+                        sun -= nbPtNeeded
+    
     if not hasPrinted:
         print ("WAIT")
 
     # GROW cellIdx | SEED sourceIdx targetIdx | COMPLETE cellIdx | WAIT <message>
     #print("WAIT")
+
+    actualTick+=1
